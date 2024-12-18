@@ -29,6 +29,15 @@ SUPPORTED_FORMATS_KEY = u"ckanext.validation.formats"
 DEFAULT_SUPPORTED_FORMATS = [u'csv', u'xls', u'xlsx']
 DEFAULT_VALIDATION_OPTIONS_KEY = "ckanext.validation.default_validation_options"
 
+SYNC_MODE = u"sync"
+ASYNC_MODE = u"async"
+
+ASYNC_UPDATE_KEY = u"ckanext.validation.run_on_update_async"
+ASYNC_CREATE_KEY = u"ckanext.validation.run_on_create_async"
+#Alt config
+SYNC_UPDATE_KEY = u"ckanext.validation.run_on_update_sync"
+SYNC_CREATE_KEY = u"ckanext.validation.run_on_create_sync"
+
 PASS_AUTH_HEADER = u"ckanext.validation.pass_auth_header"
 PASS_AUTH_HEADER_DEFAULT = True
 
@@ -65,22 +74,41 @@ def get_supported_formats():
 
 
 def get_update_mode_from_config():
-    if asbool(
-            config.get(u'ckanext.validation.run_on_update_sync', False)):
-        return u'sync'
-    elif asbool(
-            config.get(u'ckanext.validation.run_on_update_async', True)):
-        return u'async'
-    else:
-        return None
+    '''
+    config:
+     * ckanext.validation.run_on_update_sync
+     * ckanext.validation.run_on_update_async
+    Priority is sync then async options.
+
+    :return: SYNC_MODE when sync is True or async if False
+             else ASYNC_MODE if async is True
+    '''
+
+    is_sync = asbool(config.get(SYNC_UPDATE_KEY, False))
+    is_async = asbool(tk.config.get(ASYNC_UPDATE_KEY, True))
+
+    if is_sync:
+        return SYNC_MODE
+
+    return ASYNC_MODE if is_async else SYNC_MODE
 
 
 def get_create_mode_from_config():
-    if asbool(
-            config.get(u'ckanext.validation.run_on_create_sync', False)):
-        return u'sync'
-    elif asbool(
-            config.get(u'ckanext.validation.run_on_create_async', True)):
-        return u'async'
-    else:
-        return None
+    '''
+    config:
+     * ckanext.validation.run_on_create_sync
+     * ckanext.validation.run_on_create_async
+
+    Priority is sync then async options.
+
+    :return: SYNC_MODE when sync is True or async if False
+             else ASYNC_MODE if async is True
+    '''
+
+    is_sync = asbool(config.get(SYNC_CREATE_KEY, False))
+    is_async = asbool(config.get(ASYNC_CREATE_KEY, True))
+
+    if is_sync:
+        return SYNC_MODE
+
+    return ASYNC_MODE if is_async else SYNC_MODE
