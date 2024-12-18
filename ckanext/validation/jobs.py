@@ -83,7 +83,7 @@ def run_validation_job(resource):
 
     _format = resource[u'format'].lower()
 
-    report = _validate_table(source, _format=_format, schema=schema, **options)
+    report = validate_table(source, _format=_format, schema=schema, **options)
 
     # Hide uploaded files
     if isinstance(report, Report):
@@ -126,7 +126,7 @@ def run_validation_job(resource):
     utils.send_validation_report(utils.validation_dictize(validation_record))
 
 
-def _validate_table(source, _format=u'csv', schema=None, **options):
+def validate_table(source, _format=u'csv', schema=None, **options):
 
     # This option is needed to allow Frictionless Framework to validate absolute paths
     frictionless_context = {'trusted': True}
