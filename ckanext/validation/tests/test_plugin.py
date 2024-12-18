@@ -239,7 +239,7 @@ class TestPackageControllerHooksCreate(object):
 @pytest.mark.usefixtures("clean_db", "validation_setup", "with_plugins")
 class TestPackageControllerHooksUpdate(object):
 
-    @pytest.mark.ckan_config("ckanext.validation.run_on_create_async", False)
+    @pytest.mark.ckan_config("ckanext.validation.run_on_create_async", True)
     @mock.patch("ckanext.validation.logic.action.enqueue_job")
     def test_validation_runs_with_url(self, mock_enqueue):
 
@@ -261,7 +261,7 @@ class TestPackageControllerHooksUpdate(object):
         assert mock_enqueue.call_args[0][0] == run_validation_job
         assert mock_enqueue.call_args[0][1][0]["id"] == resource["id"]
 
-    @pytest.mark.ckan_config("ckanext.validation.run_on_create_async", False)
+    @pytest.mark.ckan_config("ckanext.validation.run_on_create_async", True)
     @mock.patch("ckanext.validation.logic.action.enqueue_job")
     def test_validation_runs_with_upload(self, mock_enqueue):
 
@@ -294,7 +294,7 @@ class TestPackageControllerHooksUpdate(object):
 
         mock_enqueue.assert_not_called()
 
-    @pytest.mark.ckan_config("ckanext.validation.run_on_create_async", False)
+    @pytest.mark.ckan_config("ckanext.validation.run_on_create_async", True)
     @mock.patch("ckanext.validation.logic.action.enqueue_job")
     def test_validation_run_only_supported_formats(self, mock_enqueue):
 
