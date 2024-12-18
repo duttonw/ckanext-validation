@@ -32,16 +32,18 @@ DEFAULT_VALIDATION_OPTIONS_KEY = "ckanext.validation.default_validation_options"
 SYNC_MODE = u"sync"
 ASYNC_MODE = u"async"
 
-ASYNC_UPDATE_KEY = u"ckanext.validation.run_on_update_async"
-ASYNC_CREATE_KEY = u"ckanext.validation.run_on_create_async"
-#Alt config
-SYNC_UPDATE_KEY = u"ckanext.validation.run_on_update_sync"
-SYNC_CREATE_KEY = u"ckanext.validation.run_on_create_sync"
+ASYNC_UPDATE_KEY = u"ckanext.validation.run_on_update_async"  # defaults True
+ASYNC_CREATE_KEY = u"ckanext.validation.run_on_create_async"  # defaults True
+# Alt config
+SYNC_UPDATE_KEY = u"ckanext.validation.run_on_update_sync"  # defaults False
+SYNC_CREATE_KEY = u"ckanext.validation.run_on_create_sync"  # defaults False
 
 PASS_AUTH_HEADER = u"ckanext.validation.pass_auth_header"
 PASS_AUTH_HEADER_DEFAULT = True
 
 PASS_AUTH_HEADER_VALUE = u"ckanext.validation.pass_auth_header_value"
+
+CLEANUP_REPORT = u"ckanext.validation.clean_validation_reports"
 
 
 def get_default_validation_options():
@@ -112,3 +114,7 @@ def get_create_mode_from_config():
         return SYNC_MODE
 
     return ASYNC_MODE if is_async else SYNC_MODE
+
+
+def is_cleanup_reports():
+    return asbool(config.get(CLEANUP_REPORT, False))
