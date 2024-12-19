@@ -130,10 +130,10 @@ def run_sync_validation(resource_data):
             source = _get_uploaded_resource_path(resource_data)
 
     report = jobs.validate_table(source,
-                      _format=_format,
-                      schema=schema or None,
-                      http_session=_get_session(resource_data),
-                      **options)
+                                 _format=_format,
+                                 schema=schema or None,
+                                 http_session=_get_session(resource_data),
+                                 **options)
 
     if report and not report['valid']:
         for table in report.get('tables', []):

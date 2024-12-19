@@ -3,7 +3,7 @@
 from werkzeug.datastructures import FileStorage as MockFileStorage  # noqa
 
 MOCK_COULD_BE_VALIDATED = "ckanext.validation.utils.is_resource_could_be_validated"
-MOCK_SYNC_VALIDATE = "ckanext.validation.utils.validate"
+MOCK_SYNC_VALIDATE = "ckanext.validation.jobs.validate_table"
 MOCK_ASYNC_VALIDATE = "ckanext.validation.jobs.validate"
 MOCK_ENQUEUE_JOB = "ckantoolkit.enqueue_job"
 
