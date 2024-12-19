@@ -426,7 +426,7 @@ class TestResourceValidationOnUpdateForm(object):
 @pytest.mark.usefixtures("clean_db", "validation_setup")
 class TestResourceValidationFieldsPersisted(object):
 
-    @mock.patch('ckanext.validation.utils.validate', return_value=VALID_REPORT)
+    @mock.patch('ckanext.validation.jobs.validate', return_value=VALID_REPORT)
     def test_resource_form_fields_are_persisted(self, mock_report, app,
                                                 resource_factory):
         dataset = Dataset()

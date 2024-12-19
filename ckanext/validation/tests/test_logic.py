@@ -415,7 +415,7 @@ class TestResourceValidationOnUpdate(object):
 
 
 @pytest.mark.usefixtures("clean_db", "validation_setup")
-@mock.patch('ckanext.validation.utils.validate', return_value=VALID_REPORT)
+@mock.patch('ckanext.validation.jobs.validate', return_value=VALID_REPORT)
 class TestSchemaFields(object):
 
     def test_schema_field(self, mocked_report):
@@ -468,7 +468,7 @@ class TestSchemaFields(object):
 
 
 @pytest.mark.usefixtures("clean_db", "validation_setup")
-@mock.patch('ckanext.validation.utils.validate', return_value=VALID_REPORT)
+@mock.patch('ckanext.validation.jobs.validate', return_value=VALID_REPORT)
 class TestValidationOptionsField(object):
 
     def test_validation_options_field(self, mocked_report):
