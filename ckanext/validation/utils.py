@@ -11,17 +11,16 @@ from cgi import FieldStorage
 import requests
 import ckantoolkit as tk
 from requests.exceptions import RequestException
-from goodtables import validate
 from six import string_types
 
 import ckan.plugins as plugins
 import ckan.lib.uploader as uploader
 from ckan import model
 
-import ckanext.validation.settings as s
-from ckanext.validation.interfaces import IDataValidation, IPipeValidation
-from ckanext.validation.validation_status_helper import ValidationStatusHelper, StatusTypes
-from ckanext.validation.validators import resource_schema_validator
+from . import settings as s, jobs
+from .interfaces import IDataValidation, IPipeValidation
+from .validation_status_helper import ValidationStatusHelper, StatusTypes
+from .validators import resource_schema_validator
 
 log = logging.getLogger(__name__)
 
@@ -130,8 +129,8 @@ def run_sync_validation(resource_data):
         else:
             source = _get_uploaded_resource_path(resource_data)
 
-    report = validate(source,
-                      format=_format,
+    report = jobs.validate_table(source,
+                      _format=_format,
                       schema=schema or None,
                       http_session=_get_session(resource_data),
                       **options)
