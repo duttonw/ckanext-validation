@@ -1,9 +1,12 @@
 # encoding: utf-8
 
-from werkzeug.datastructures import FileStorage as MockFileStorage  # noqa
+import io
+import mock
+
+from werkzeug.datastructures import FileStorage
 
 MOCK_COULD_BE_VALIDATED = "ckanext.validation.utils.is_resource_could_be_validated"
-MOCK_SYNC_VALIDATE = "ckanext.validation.jobs.validate_table"
+MOCK_SYNC_VALIDATE = "ckanext.validation.jobs.validate"
 MOCK_ASYNC_VALIDATE = "ckanext.validation.jobs.validate"
 MOCK_ENQUEUE_JOB = "ckantoolkit.enqueue_job"
 
@@ -100,12 +103,12 @@ ERROR_REPORT = {
 VALID_REPORT_LOCAL_FILE = {
     'error-count': 0,
     'table-count': 1,
-    'tables': [{
+    'tasks': [{
         'error-count': 0,
         'errors': [],
         'headers': ['name', 'ward', 'party', 'other'],
         'row-count': 79,
-        'source': '/data/resources/31f/d4c/1e-9c82-424b-b78b-48cd08db6e64',
+        'place': '/data/resources/31f/d4c/1e-9c82-424b-b78b-48cd08db6e64',
         'time': 0.007,
         'valid': True
     }],
@@ -113,3 +116,20 @@ VALID_REPORT_LOCAL_FILE = {
     'valid': True,
     'warnings': []
 }
+
+
+class MockFileStorage(FileStorage):
+    pass
+
+class NamedBytesIO(io.BytesIO):
+    def __init__(self, content, name):
+        super().__init__(content)
+        self.name = name
+
+def get_mock_file(contents):
+    mock_file = NamedBytesIO(contents, 'test.csv')
+
+    # stream = io.BufferedReader(mock_file)
+    # mock.patch("io.open", return_value=stream)
+
+    return mock_file

@@ -2,13 +2,16 @@
 
 import logging
 import json
+import re
 import os
+
 from six import ensure_str
 from io import BytesIO
 from datetime import datetime as dt
 from cgi import FieldStorage
 
 import requests
+from frictionless import Report
 import ckantoolkit as tk
 from requests.exceptions import RequestException
 from six import string_types
@@ -132,21 +135,29 @@ def run_sync_validation(resource_data):
     report = jobs.validate_table(source,
                                  _format=_format,
                                  schema=schema or None,
-                                 http_session=_get_session(resource_data),
                                  **options)
 
-    if report and not report['valid']:
+    # Hide uploaded files
+    if isinstance(report, Report):
+        report = report.to_dict()
+
+    if u'tasks' in report:
+        for table in report['tasks']:
+            if table['place'].startswith('/'):
+                table['place'] = resource_data['url']
+
+    if u'warnings' in report:
+        for index, warning in enumerate(report['warnings']):
+            report['warnings'][index] = re.sub(r'Table ".*"', 'Table', warning)
+
+    if u'valid' not in report:
         for table in report.get('tables', []):
             table['source'] = resource_data['url']
 
         raise tk.ValidationError({u'validation': [report]})
     else:
-        _table_count = report.get('table-count', 0) > 0
-
-        resource_data[
-            'validation_status'] = StatusTypes.success if _table_count else ""
-        resource_data['validation_timestamp'] = str(
-            dt.now()) if _table_count else ""
+        resource_data['validation_status'] = StatusTypes.success
+        resource_data['validation_timestamp'] = str(dt.now())
         resource_data['_success_validation'] = True
 
 
@@ -199,10 +210,13 @@ def _get_new_file_stream(file):
     if isinstance(file, FieldStorage):
         file = file.file
 
-    stream = BytesIO(file.read())
+    temp_stream = BytesIO(file.read())
+    # Optionally assign a `name` attribute to mimic a file-like object
+    temp_stream.name = file.filename  # Use the original filename if needed
+
     file.seek(0)
 
-    return stream
+    return temp_stream
 
 
 def run_async_validation(resource_id):

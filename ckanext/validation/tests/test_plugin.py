@@ -1,5 +1,4 @@
 # encoding: utf-8
-import io
 
 import mock
 import pytest
@@ -8,7 +7,7 @@ from ckan.tests.helpers import call_action
 from ckan.tests import factories
 
 import ckanext.validation.settings as s
-import ckanext.validation.tests.helpers as helpers
+from . import helpers
 from ckanext.validation.jobs import run_validation_job
 
 
@@ -54,8 +53,8 @@ class TestResourceControllerHooksUpdate(object):
 
     def test_validation_run_on_upload(self, mock_enqueue, resource_factory):
         """Validation must be triggered during update on upload new file"""
-        mock_upload = helpers.MockFileStorage(io.BytesIO(helpers.VALID_CSV),
-                                              'valid.csv')
+        mock_upload = helpers.MockFileStorage(
+            helpers.get_mock_file(helpers.VALID_CSV), 'valid.csv')
 
         resource = resource_factory(format="pdf")
 

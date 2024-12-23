@@ -1,6 +1,5 @@
 # encoding: utf-8
 
-import io
 import json
 
 import responses
@@ -20,7 +19,7 @@ from ckanext.validation.jobs import (
     Session,
     requests,
 )
-from ckanext.validation.tests.helpers import (
+from .helpers import (
     INVALID_REPORT,
     VALID_REPORT,
     ERROR_REPORT,
@@ -29,6 +28,7 @@ from ckanext.validation.tests.helpers import (
     SCHEMA,
     MockFileStorage,
     MOCK_ASYNC_VALIDATE,
+    get_mock_file,
 )
 
 
@@ -64,7 +64,6 @@ class TestValidationJob(object):
 
         mock_validate.assert_called_with('http://example.com/file.csv',
                                          format='csv',
-                                         http_session='Some_Session',
                                          schema=None)
 
     @mock.patch(MOCK_ASYNC_VALIDATE, return_value=VALID_REPORT)
@@ -85,7 +84,6 @@ class TestValidationJob(object):
 
         mock_validate.assert_called_with('http://example.com/file.csv',
                                          format='csv',
-                                         http_session='Some_Session',
                                          schema=SCHEMA)
 
     @mock.patch(MOCK_ASYNC_VALIDATE, return_value=VALID_REPORT)
@@ -111,7 +109,6 @@ class TestValidationJob(object):
         mock_validate.assert_called_with('/tmp/example/{}'.format(
             resource['id']),
             format='csv',
-            http_session='Some_Session',
             schema=None)
 
     def test_job_run_valid_stores_validation_object(self, mocked_responses):
@@ -128,7 +125,7 @@ class TestValidationJob(object):
         assert validation.status == 'success'
         assert validation.report['error-count'] == 0
         assert validation.report['table-count'] == 1
-        assert validation.report['tables'][0]['source'] == url
+        assert validation.report['tasks'][0]['source'] == url
         assert validation.finished
 
     @mock.patch(MOCK_ASYNC_VALIDATE, return_value=INVALID_REPORT)
@@ -143,9 +140,9 @@ class TestValidationJob(object):
             Validation.resource_id == resource['id']).one()
 
         assert validation.status == 'failure'
-        assert validation.report['error-count'] == 2
-        assert validation.report['table-count'] == 1
-        assert validation.report['tables'][0]['source'] == url
+        assert validation.report['error-count'] == '2'
+        assert validation.report['table-count'] == '1'
+        assert validation.report['tasks'][0]['source'] == url
         assert validation.finished
 
     @mock.patch(MOCK_ASYNC_VALIDATE, return_value=ERROR_REPORT)
@@ -171,7 +168,7 @@ class TestValidationJob(object):
         validation = Session.query(Validation).filter(
             Validation.resource_id == resource['id']).one()
 
-        assert validation.report['tables'][0]['source'].startswith('http')
+        assert validation.report['tasks'][0]['source'].startswith('http')
 
     def test_job_run_valid_stores_status_in_resource(self, resource_factory):
         resource = resource_factory(do_not_validate=True)
@@ -187,7 +184,8 @@ class TestValidationJob(object):
 
     def test_job_local_paths_are_hidden(self, resource_factory):
         """Local path for a resource file must be hidden inside report"""
-        upload = MockFileStorage(io.BytesIO(INVALID_CSV), 'invalid.csv')
+        upload = MockFileStorage(get_mock_file(INVALID_CSV), 'invalid.csv')
+
         resource = resource_factory(upload=upload, do_not_validate=True)
 
         run_validation_job(resource)
@@ -195,13 +193,13 @@ class TestValidationJob(object):
         validation = Session.query(Validation).filter(
             Validation.resource_id == resource['id']).one()
 
-        source = validation.report['tables'][0]['source']
+        source = validation.report['tasks'][0]['source']
         assert source.startswith('http')
         assert source.endswith('invalid.csv')
 
     def test_job_pass_validation_options(self, resource_factory):
         valid_csv = b'a,b,c,d\n#comment\n1,2,3,4'
-        upload = MockFileStorage(io.BytesIO(valid_csv), 'valid.csv')
+        upload = MockFileStorage(get_mock_file(valid_csv), 'valid.csv')
 
         validation_options = {'headers': 1, 'skip_rows': ['#']}
 
@@ -225,7 +223,7 @@ class TestValidationJob(object):
             "delimiter": ";"
         }'''
 
-        mock_upload = MockFileStorage(io.BytesIO(invalid_csv), 'invalid.csv')
+        mock_upload = MockFileStorage(get_mock_file(invalid_csv), 'invalid.csv')
 
         resource = resource_factory(upload=mock_upload,
                                     validation_options=validation_options,

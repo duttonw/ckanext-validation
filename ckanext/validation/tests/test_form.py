@@ -298,7 +298,7 @@ class TestResourceValidationOptionsForm(object):
             json.dumps(options, indent=2, sort_keys=True)
 
         new_options = {
-            'delimiter': ',',
+            "delimiter": ",",
             'headers': 4,
             'skip_rows': ['#'],
             'skip_tests': ['blank-rows'],
@@ -416,11 +416,11 @@ class TestResourceValidationOnUpdateForm(object):
             _post(app,
                   EDIT_RESOURCE_URL.format(dataset['id'], resource["id"]),
                   params,
-                  upload=[('upload', 'data.csv', INVALID_CSV)]))
+                  upload=[('upload', 'invalid.csv', INVALID_CSV)]))
 
-        assert 'validation' in response
-        assert 'missing-value' in response
-        assert 'Row 2 has a missing value in column 4' in response
+        assert "validation" in response
+        assert "missing-cell" in response
+        assert "Row 2 has a missing value in column 4" in response
 
 
 @pytest.mark.usefixtures("clean_db", "validation_setup")
