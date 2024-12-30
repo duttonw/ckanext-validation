@@ -66,7 +66,14 @@ commands:
 
   logs:
     usage: Show Docker logs.
-    cmd: sh bin/docker-compose.sh logs "$@"
+    cmd: |
+      # Loop through each container and wrap with github log groups
+      services=$(bin/docker-compose.sh ps --services)
+      for service in $services; do
+        echo "::group::$service"
+        sh bin/docker-compose.sh logs "$service"
+        echo "::endgroup::"
+      done
 
   pull:
     usage: Pull latest docker images.
