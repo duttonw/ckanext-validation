@@ -61,7 +61,7 @@ def log_in_directly(context):
     assert context.persona, "A persona is required to log in, found [{}] in context. Have you configured the personas in before_scenario?".format(context.persona)
     context.execute_steps(u"""
         When I attempt to log in with password "$password"
-        Then I should see an element with xpath "//a[@title='Log out']"
+        Then I should see an element with xpath "//*[self::a or self::button][@title='Log out']"
     """)
 
 
