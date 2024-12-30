@@ -42,7 +42,7 @@ done
 pip install -e .
 # force version that declares itself to be incompatible but actually works
 #pip install click==7.1.2
-if [ "$CKAN_VERSION" == "2.9" ]; then
+if [ "$CKAN_VERSION" = "2.9" ]; then
   echo "CKAN 2.9 last supported Jinja2 is less than 3.1"
   pip install "jinja2<3.1"
 fi
