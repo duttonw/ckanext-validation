@@ -1,5 +1,9 @@
 FROM ckan/ckan-dev:{CKAN_VERSION}
 
+# swap between root and unprivileged user
+ARG ORIGINAL_USER
+RUN ORIGINAL_USER=$(id -un)
+
 ARG SITE_URL=http://ckan:5000/
 ENV PYTHON_VERSION={PYTHON_VERSION}
 ENV CKAN_VERSION={CKAN_VERSION}
@@ -8,6 +12,8 @@ ENV CKAN_SITE_URL="${SITE_URL}"
 ENV PYTHON={PYTHON}
 
 WORKDIR "${APP_DIR}"
+
+USER root
 
 ENV DOCKERIZE_VERSION v0.9.1
 # Install dependencies and dockerize based on the base image
@@ -26,7 +32,7 @@ RUN ARCH=$(uname -m); \
         fi; \
     elif [ -f /etc/debian_version ]; then \
         apt-get update && \
-        apt-get install -y --no-install-recommends build-essential curl && \
+        apt-get install -y --no-install-recommends build-essential curl procps && \
         rm -rf /var/lib/apt/lists/*; \
         if [ "$ARCH" = "x86_64" ]; then \
             curl -sL https://github.com/jwilder/dockerize/releases/download/${DOCKERIZE_VERSION}/dockerize-linux-amd64-${DOCKERIZE_VERSION}.tar.gz \
@@ -42,6 +48,8 @@ RUN ARCH=$(uname -m); \
         echo "Unsupported base image"; \
         exit 1; \
     fi
+
+USER "$ORIGINAL_USER"
 
 COPY .docker/test.ini $CKAN_INI
 
