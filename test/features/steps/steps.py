@@ -1,7 +1,7 @@
 from behave import when, then
 from behaving.personas.steps import *  # noqa: F401, F403
 from behaving.web.steps import *  # noqa: F401, F403
-from behaving.web.steps.basic import should_see
+from behaving.web.steps.basic import should_see_within_timeout
 
 
 @when(u'I take a debugging screenshot')
@@ -23,7 +23,7 @@ def go_to_home(context):
 
 @then(u'I should see text containing quotes `{text}`')
 def should_see_backquoted(context, text):
-    should_see(context, text)
+    should_see_within_timeout(context, text, 5)
 
 
 @when(u'I go to register page')
@@ -62,7 +62,7 @@ def log_in_directly(context):
         " Have you configured the personas in before_scenario?".format(context.persona)
     context.execute_steps(u"""
         When I attempt to log in with password "$password"
-        Then I should see an element with xpath "//*[self::a or self::button][@title='Log out']"
+        Then I should see an element with xpath "//*[self::a or self::button][@title='Log out']" within 2 seconds
     """)
 
 
@@ -81,7 +81,7 @@ def go_to_new_resource_form(context, name):
     context.execute_steps(u"""
         When I edit the "{0}" dataset
     """.format(name))
-    if context.browser.is_element_present_by_xpath("//*[contains(@class, 'btn-primary') and contains(string(), 'Next:')]"):
+    if context.browser.is_element_present_by_xpath("//*[contains(@class, 'btn-primary') and contains(string(), 'Next:')]", wait_time=2):
         # Draft dataset, proceed directly to resource form
         context.execute_steps(u"""
             When I press "Next:"
@@ -89,7 +89,7 @@ def go_to_new_resource_form(context, name):
     else:
         # Existing dataset, browse to the resource form
         if context.browser.is_element_present_by_xpath(
-                "//a[contains(string(), 'Resources') and contains(@href, '/dataset/resources/')]"):
+                "//a[contains(string(), 'Resources') and contains(@href, '/dataset/resources/')]", wait_time=2):
             context.execute_steps(u"""
                     When I press "Resources"
                     And I press "Add new resource"
@@ -201,6 +201,6 @@ def go_to_group_including_users(context, group_id, group_type, including):
 @then(u'I should see a validation timestamp')
 def should_see_validation_timestamp(context):
     context.execute_steps(u"""
-        Then I should see "Validation timestamp"
+        Then I should see "Validation timestamp" within 2 seconds
         And I should see an element with xpath "//th[contains(string(), 'Validation timestamp')]/../td[contains(string(), '-') and contains(string(), ':') and contains(string(), '.')]"
     """)
