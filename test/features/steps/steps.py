@@ -58,7 +58,8 @@ def log_in_directly(context):
     :return:
     """
 
-    assert context.persona, "A persona is required to log in, found [{}] in context. Have you configured the personas in before_scenario?".format(context.persona)
+    assert context.persona, "A persona is required to log in, found [{}] in context." \
+        " Have you configured the personas in before_scenario?".format(context.persona)
     context.execute_steps(u"""
         When I attempt to log in with password "$password"
         Then I should see an element with xpath "//*[self::a or self::button][@title='Log out']"
@@ -85,17 +86,17 @@ def go_to_new_resource_form(context, name):
         context.execute_steps(u"""
             When I press "Next:"
         """)
-    elif context.browser.is_element_present_by_xpath("//*[contains(string(), 'Add new resource')]"):
-        # Existing dataset, browse to the resource form
-        context.execute_steps(u"""
-                   And I press "Add new resource"
-               """)
     else:
         # Existing dataset, browse to the resource form
+        if context.browser.is_element_present_by_xpath(
+                "//a[contains(string(), 'Resources') and contains(@href, '/dataset/resources/')]"):
+            context.execute_steps(u"""
+                    When I press "Resources"
+                """)
         context.execute_steps(u"""
-            When I press "Resources"
-            And I press "Add new resource"
-        """)
+                When I press "Add new resource"
+                And I take a debugging screenshot
+            """)
 
 
 @when(u'I create a resource with name "{name}" and URL "{url}"')
@@ -122,6 +123,7 @@ def go_to_dataset_page(context):
 def go_to_dataset(context, name):
     context.execute_steps(u"""
         When I visit "/dataset/{0}"
+        And I take a debugging screenshot
     """.format(name))
 
 

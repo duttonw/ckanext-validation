@@ -139,7 +139,7 @@ commands:
     usage: Run unit tests.
     cmd: |
       ahoy title 'Run unit tests'
-      ahoy cli 'pytest --ckan-ini=${CKAN_INI} $APP_DIR/ckanext' || \
+      ahoy cli 'pytest --cov-report=xml --cov-append --junit-xml=TESTS-results.xml --ckan-ini=${CKAN_INI} $APP_DIR/ckanext' || \
       [ "${ALLOW_UNIT_FAIL:-0}" -eq 1 ]
 
   test-bdd:
@@ -149,7 +149,7 @@ commands:
       ahoy cli "rm -f test/screenshots/*"
       ahoy start-ckan-job-worker
       sleep 5
-      ahoy cli "behave -k ${*:-test/features} $EXTRA_TAGS --tags=${BEHAVE_TAG:--format_autocomplete}" || \
+      ahoy cli "behave  --junit  --junit-directory . -k ${*:-test/features} $EXTRA_TAGS --tags=${BEHAVE_TAG:--format_autocomplete}" || \
       [ "${ALLOW_BDD_FAIL:-0}" -eq 1 ]
       ahoy stop-ckan-job-worker
 

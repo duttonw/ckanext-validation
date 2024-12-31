@@ -57,7 +57,7 @@ TEST_ORG=$( \
         "description": "Organisation for testing issues"}' \
     ${CKAN_ACTION_URL}/organization_create
 )
-#echo $TEST_ORG
+echo $TEST_ORG
 TEST_ORG_ID=$(echo $TEST_ORG | ${PYTHON-python3} ${APP_DIR}/bin/extract-id.py)
 
 echo "Assigning test users to '${TEST_ORG_TITLE}' organisation (${TEST_ORG_ID}):"
