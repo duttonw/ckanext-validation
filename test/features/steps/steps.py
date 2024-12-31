@@ -92,11 +92,13 @@ def go_to_new_resource_form(context, name):
                 "//a[contains(string(), 'Resources') and contains(@href, '/dataset/resources/')]"):
             context.execute_steps(u"""
                     When I press "Resources"
+                    And I press "Add new resource"
                 """)
-        context.execute_steps(u"""
-                When I press "Add new resource"
-                And I take a debugging screenshot
-            """)
+        else:
+            context.execute_steps(u"""
+                    When I press "Add new resource"
+                    And I take a debugging screenshot
+                """)
 
 
 @when(u'I create a resource with name "{name}" and URL "{url}"')
